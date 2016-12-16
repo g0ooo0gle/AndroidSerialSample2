@@ -119,7 +119,7 @@ public class Serial {
             public void run() {
                 while (!StopFlag){
                     Runnable = true;
-                    final byte buf[] = new byte[1024];
+                    final byte buf[] = new byte[512];
                     try {
                         final int num = mmInStream.read(buf);
                         readMsg = new String(buf, 0, num);

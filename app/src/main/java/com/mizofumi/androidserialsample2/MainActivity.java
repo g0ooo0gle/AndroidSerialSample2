@@ -9,6 +9,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+
+import java.util.ArrayList;
 
 import java.util.UUID;
 
@@ -18,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     Serial serial;
     String deviceName;
     FloatingActionButton fab;
+    LineChart linechart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,35 +62,44 @@ public class MainActivity extends AppCompatActivity {
             public void read(String data) {
 
                 String recived = "";
+                Log.d(getLocalClassName(),data);
 
-                //断片化したデータを結合
-                if (data != null || data.length() != 0){
-                    if (data.contains("\r\n")){
-                        recived = tmp + data.replaceAll("\r\n","");
-                        tmp = "";
-                    }else {
-                        tmp += data;
+                try{
+                    //断片化したデータを結合
+                    if (data != null || data.length() != 0){
+                        if (data.contains("#")){
+                            recived = tmp + data.replaceAll("#","");
+                            tmp = "";
+                        }else {
+                            tmp += data;
+                        }
+
+
+                        //データにnullが含まれてない。かつ、データの長さが0以上
+                        if (!recived.contains("null") && recived.length() > 0){
+                            status.setText("データ受信中..."+recived);
+                            Log.d(getLocalClassName(),recived);
+
+                            //データをFloat型に変換
+                            float recived_data = Float.parseFloat(recived);
+
+                            String [] dataarray = data.split(",");
+                            if(dataarray.length >= 2) {
+                                Log.d("Recived", dataarray[0] + "," + dataarray[1]);
+                            }
+
+
+                        }
                     }
+                }catch (NumberFormatException e){
 
-
-                    //データにnullが含まれてない。かつ、データの長さが0以上
-                    if (!recived.contains("null") && recived.length() > 0){
-                        status.setText("データ受信中..."+recived);
-                        Log.d(getLocalClassName(),recived);
-
-                        //データをFloat型に変換
-                        float recived_data = Float.parseFloat(recived);
-
-
-
-
-                    }
                 }
+
             }
 
             @Override
             public void read_failed(String errorMessage) {
-                status.setText("データの受信に失敗...");
+                //status.setText("データの受信に失敗...");
             }
 
             @Override
